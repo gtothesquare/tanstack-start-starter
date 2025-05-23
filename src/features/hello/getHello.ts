@@ -6,7 +6,7 @@ interface FullName {
 }
 
 export const getHelloWorld = async () => {
-  const data = { firstName: 'Hello', lastName: 'World' };
+  const data: FullName = { firstName: 'Hello', lastName: 'World' };
 
   return Promise.resolve(`hello, ${data.firstName} ${data.lastName}`);
 };
