@@ -8,26 +8,73 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { createServerRootRoute } from '@tanstack/react-start/server'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as PathlessLayoutRouteImport } from './routes/_pathlessLayout/route'
-import { Route as PathlessLayoutIndexImport } from './routes/_pathlessLayout/index'
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as PathlessLayoutRouteRouteImport } from './routes/_pathlessLayout/route'
+import { Route as PathlessLayoutIndexRouteImport } from './routes/_pathlessLayout/index'
+import { ServerRoute as ApiHelloServerRouteImport } from './routes/api/hello'
 
-// Create/Update Routes
+const rootServerRouteImport = createServerRootRoute()
 
-const PathlessLayoutRouteRoute = PathlessLayoutRouteImport.update({
+const PathlessLayoutRouteRoute = PathlessLayoutRouteRouteImport.update({
   id: '/_pathlessLayout',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const PathlessLayoutIndexRoute = PathlessLayoutIndexImport.update({
+const PathlessLayoutIndexRoute = PathlessLayoutIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => PathlessLayoutRouteRoute,
 } as any)
+const ApiHelloServerRoute = ApiHelloServerRouteImport.update({
+  id: '/api/hello',
+  path: '/api/hello',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 
-// Populate the FileRoutesByPath interface
+export interface FileRoutesByFullPath {
+  '/': typeof PathlessLayoutIndexRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof PathlessLayoutIndexRoute
+}
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/_pathlessLayout': typeof PathlessLayoutRouteRouteWithChildren
+  '/_pathlessLayout/': typeof PathlessLayoutIndexRoute
+}
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/'
+  id: '__root__' | '/_pathlessLayout' | '/_pathlessLayout/'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  PathlessLayoutRouteRoute: typeof PathlessLayoutRouteRouteWithChildren
+}
+export interface FileServerRoutesByFullPath {
+  '/api/hello': typeof ApiHelloServerRoute
+}
+export interface FileServerRoutesByTo {
+  '/api/hello': typeof ApiHelloServerRoute
+}
+export interface FileServerRoutesById {
+  __root__: typeof rootServerRouteImport
+  '/api/hello': typeof ApiHelloServerRoute
+}
+export interface FileServerRouteTypes {
+  fileServerRoutesByFullPath: FileServerRoutesByFullPath
+  fullPaths: '/api/hello'
+  fileServerRoutesByTo: FileServerRoutesByTo
+  to: '/api/hello'
+  id: '__root__' | '/api/hello'
+  fileServerRoutesById: FileServerRoutesById
+}
+export interface RootServerRouteChildren {
+  ApiHelloServerRoute: typeof ApiHelloServerRoute
+}
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
@@ -35,20 +82,29 @@ declare module '@tanstack/react-router' {
       id: '/_pathlessLayout'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof PathlessLayoutRouteImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof PathlessLayoutRouteRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_pathlessLayout/': {
       id: '/_pathlessLayout/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof PathlessLayoutIndexImport
-      parentRoute: typeof PathlessLayoutRouteImport
+      preLoaderRoute: typeof PathlessLayoutIndexRouteImport
+      parentRoute: typeof PathlessLayoutRouteRoute
     }
   }
 }
-
-// Create and export the route tree
+declare module '@tanstack/react-start/server' {
+  interface ServerFileRoutesByPath {
+    '/api/hello': {
+      id: '/api/hello'
+      path: '/api/hello'
+      fullPath: '/api/hello'
+      preLoaderRoute: typeof ApiHelloServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+  }
+}
 
 interface PathlessLayoutRouteRouteChildren {
   PathlessLayoutIndexRoute: typeof PathlessLayoutIndexRoute
@@ -61,61 +117,15 @@ const PathlessLayoutRouteRouteChildren: PathlessLayoutRouteRouteChildren = {
 const PathlessLayoutRouteRouteWithChildren =
   PathlessLayoutRouteRoute._addFileChildren(PathlessLayoutRouteRouteChildren)
 
-export interface FileRoutesByFullPath {
-  '': typeof PathlessLayoutRouteRouteWithChildren
-  '/': typeof PathlessLayoutIndexRoute
-}
-
-export interface FileRoutesByTo {
-  '/': typeof PathlessLayoutIndexRoute
-}
-
-export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/_pathlessLayout': typeof PathlessLayoutRouteRouteWithChildren
-  '/_pathlessLayout/': typeof PathlessLayoutIndexRoute
-}
-
-export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/_pathlessLayout' | '/_pathlessLayout/'
-  fileRoutesById: FileRoutesById
-}
-
-export interface RootRouteChildren {
-  PathlessLayoutRouteRoute: typeof PathlessLayoutRouteRouteWithChildren
-}
-
 const rootRouteChildren: RootRouteChildren = {
   PathlessLayoutRouteRoute: PathlessLayoutRouteRouteWithChildren,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/_pathlessLayout"
-      ]
-    },
-    "/_pathlessLayout": {
-      "filePath": "_pathlessLayout/route.tsx",
-      "children": [
-        "/_pathlessLayout/"
-      ]
-    },
-    "/_pathlessLayout/": {
-      "filePath": "_pathlessLayout/index.tsx",
-      "parent": "/_pathlessLayout"
-    }
-  }
+const rootServerRouteChildren: RootServerRouteChildren = {
+  ApiHelloServerRoute: ApiHelloServerRoute,
 }
-ROUTE_MANIFEST_END */
+export const serverRouteTree = rootServerRouteImport
+  ._addFileChildren(rootServerRouteChildren)
+  ._addFileTypes<FileServerRouteTypes>()
